@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Modern Calculator</title>
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #1e1e2f;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  /* Calculator Container */
+  .calculator {
+    background: #282c44;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    width: 320px;
+    padding: 30px 25px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+  }
+
+  /* Display */
+  .display {
+    background: #1f2235;
+    color: #e0e1e6;
+    font-size: 2.5rem;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: right;
+    overflow-x: auto;
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Buttons grid */
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+
+  button {
+    border: none;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ececf1;
+    background: #3e4177;
+    box-shadow: 0 6px #303361;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.2s;
+    padding: 18px 0;
+    user-select: none;
+  }
+  button:hover {
+    background: #575bb5;
+  }
+  button:active {
+    box-shadow: 0 3px #1d1e2e;
+    transform: translateY(3px);
+  }
+
+  /* Special buttons */
+  .operator {
+    background: #ff9500;
+    box-shadow: 0 6px #b26b00;
+  }
+  .operator:hover {
+    background: #ffb347;
+  }
+  .operator:active {
+    box-shadow: 0 3px #7f4c00;
+  }
+  .clear {
+    background: #ff3b30;
+    box-shadow: 0 6px #b0261f;
+  }
+  .clear:hover {
+    background: #ff675e;
+  }
+  .clear:active {
+    box-shadow: 0 3px #7f1a14;
+  }
+  .equal {
+    background: #28c76f;
+    box-shadow: 0 6px #1f8a4c;
+    grid-column: span 2;
+  }
+  .equal:hover {
+    background: #55d988;
+  }
+  .equal:active {
+    box-shadow: 0 3px #11622c;
+  }
+
+  /* Zero button spans 2 columns */
+  .zero {
+    grid-column: span 2;
+  }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <div id="display" class="display">0</div>
+  <div class="buttons">
+    <button class="clear" onclick="clearDisplay()">C</button>
+    <button onclick="appendNumber('7')">7</button>
+    <button onclick="appendNumber('8')">8</button>
+    <button onclick="appendNumber('9')">9</button>
+    <button class="operator" onclick="appendOperator('/')">÷</button>
+
+    <button onclick="appendNumber('4')">4</button>
+    <button onclick="appendNumber('5')">5</button>
+    <button onclick="appendNumber('6')">6</button>
+    <button class="operator" onclick="appendOperator('*')">×</button>
+
+    <button onclick="appendNumber('1')">1</button>
+    <button onclick="appendNumber('2')">2</button>
+    <button onclick="appendNumber('3')">3</button>
+    <button class="operator" onclick="appendOperator('-')">−</button>
+
+    <button class="zero" onclick="appendNumber('0')">0</button>
+    <button onclick="appendNumber('.')">.</button>
+    <button class="equal" onclick="calculate()">=</button>
+    <button class="operator" onclick="appendOperator('+')">+</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+  let currentInput = '';
+
+  function appendNumber(number) {
+    if (currentInput === '0' && number === '0') return;
+    if (currentInput === '0' && number !== '.') {
+      currentInput = number;
+    } else {
+      currentInput += number;
+    }
+    updateDisplay();
+  }
+
+  function appendOperator(operator) {
+    if (currentInput === '') return;
+    const lastChar = currentInput.slice(-1);
+    if ('+-*/'.includes(lastChar)) {
+      currentInput = currentInput.slice(0, -1) + operator;
+    } else {
+      currentInput += operator;
+    }
+    updateDisplay();
+  }
+
+  function calculate() {
+    try {
+      // Use Function constructor to safely evaluate expression
+      let result = Function('"use strict";return (' + currentInput + ')')();
+      if (result === Infinity || result === -Infinity) throw 'Division by zero';
+      currentInput = result.toString();
+      updateDisplay();
+    } catch {
+      currentInput = 'Error';
+      updateDisplay();
+      currentInput = '';
+    }
+  }
+
+  function clearDisplay() {
+    currentInput = '';
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    display.textContent = currentInput || '0';
+  }
+</script>
+
+</body>
+</html>
